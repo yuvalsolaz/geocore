@@ -2,7 +2,13 @@ import sys,os
 import pandas as pd
 import googlemaps
 
-gmaps = googlemaps.Client(key='AIzaSyBK9irAZ_Jtzt9ZKRDoAmWfe72_uny4Md0')
+try:
+    from apikey import mykey
+except:
+    print(f'please add file src/apikey.py with one line:\n mykey=<valid api key> \n to your local repository')
+    exit(10)
+
+gmaps = googlemaps.Client(key=mykey)
 
 def geocoding(text):
     print(f'geocoding {text}')
