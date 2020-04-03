@@ -1,15 +1,7 @@
 import sys,os
 import pandas as pd
 import pickle
-import googlemaps
 
-try:
-    from apikey import mykey
-except:
-    print(f'please add file src/apikey.py with one line:\n mykey=<valid api key> \n to your local repository')
-    exit(10)
-
-gmaps = googlemaps.Client(key=mykey)
 
 #region consts
 query_results_file = r'../data/gapi_results.pkl'
@@ -17,12 +9,6 @@ location_col = 'מקום'
 id = 'OBJECTID'
 # endregion consts
 
-def get_geo(id,query_results):
-    res = query_results[id] #gmaps.geocode(text)
-    if len(res) < 1 :
-        return None
-    geo = res[0]['geometry']['location']
-    return (geo['lat'],geo['lng'])
 
 
 if __name__ == '__main__':
@@ -48,6 +34,13 @@ if __name__ == '__main__':
             query_results = pickle.load(fp)
     else:
         print(f'query api for {df.shape[0]} records:')
+        import googlemaps
+        try:
+            from apikey import mykey
+        except:
+            print(f'please add file src/apikey.py with one line:\n mykey=<valid api key> \n to your local repository')
+            exit(10)
+        gmaps = googlemaps.Client(key=mykey)
         for index,row in df.iterrows():
             query_results[row[id]] = gmaps.geocode(row[location_col])
         print(f'save results to : {query_results_file}')
@@ -55,7 +48,16 @@ if __name__ == '__main__':
             pickle.dump(query_results, fp)
 
     print('add query results to input dataframe:')
-    df['gmapapi'] = df[id].apply(lambda t : get_geo(t,query_results))
+
+
+    def get_geo_x(id, query_results):
+        return query_results[id][0]['geometry']['location']['lng'] if len(query_results[id]) > 0 else None
+
+    def get_geo_y(id, query_results):
+        return query_results[id][0]['geometry']['location']['lat'] if len(query_results[id]) > 0 else None
+
+    df['gmapapi_x'] = df[id].apply(lambda t : get_geo_x(t,query_results))
+    df['gmapapi_y'] = df[id].apply(lambda t : get_geo_y(t,query_results))
 
     new_file_name = file_name.replace('.csv', '_results.csv')
     print(f'save input dataframe with query results to: {new_file_name}')
