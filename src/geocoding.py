@@ -73,8 +73,20 @@ if __name__ == '__main__':
         return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
 
 
+    def get_partial_match(id,query_results):
+        if  len(query_results[id]) < 1:
+            return None
+        return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
+
+
+    def get_location_type(id, query_results):
+        return query_results[id][0]['geometry']['location_type'] if len(query_results[id]) > 0 else None
+
+
+
     df['gmapapi_x'] = df[id].apply(lambda t : get_geo_x(t,query_results))
     df['gmapapi_y'] = df[id].apply(lambda t : get_geo_y(t,query_results))
+    df['gmapapi_location_type'] = df[id].apply(lambda t: get_location_type(t, query_results))
     df['gmapapi_viewport_x'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=0))
     df['gmapapi_viewport_y'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=1))
     df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]))
