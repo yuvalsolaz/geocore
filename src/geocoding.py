@@ -65,13 +65,20 @@ if __name__ == '__main__':
         vp = query_results[id][0]['geometry']['viewport']
         northeast = geo2utm(vp['northeast']['lat'],vp['northeast']['lng'])
         southwest = geo2utm(vp['southwest']['lat'],vp['southwest']['lng'])
-        return np.abs(northeast[0] - southwest[0]) if axis == 0 else np.abs(northeast[1] - southwest[1])
+        return int(np.abs(northeast[0] - southwest[0])) if axis == 0 else int(np.abs(northeast[1] - southwest[1]))
+
+    def get_partial_match(id,query_results):
+        if  len(query_results[id]) < 1:
+            return None
+        return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
+
 
     df['gmapapi_x'] = df[id].apply(lambda t : get_geo_x(t,query_results))
     df['gmapapi_y'] = df[id].apply(lambda t : get_geo_y(t,query_results))
     df['gmapapi_viewport_x'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=0))
     df['gmapapi_viewport_y'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=1))
     df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]))
+    df['gmapapi_partial_match'] = df[id].apply(lambda t : get_partial_match(t,query_results))
 
     new_file_name = file_name.replace('.csv', '_results.csv')
     print(f'save input dataframe with query results to: {new_file_name}')
