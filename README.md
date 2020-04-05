@@ -5,3 +5,9 @@
 4. creates new csv file: ./data/test_results.csv with coordinates and some additional data 
 5. if the api results file ( ./data/gapi_results.pkl) exists the script will not call the api 
 
+usage:
+python src/geocore.py <input csv>
+
+example :
+python src/geocore.py ./data/test.csv
+
