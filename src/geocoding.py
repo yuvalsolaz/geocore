@@ -7,7 +7,7 @@ from pyproj import Proj
 myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 #region consts
-query_results_file = r'../data/gapi_results.pkl'
+query_results_file = os.path.join(os.getcwd(), r'../data/gapi_results.pkl')
 location_col = 'place'
 id = 'OBJECTID'
 # endregion consts
@@ -15,6 +15,8 @@ id = 'OBJECTID'
 def geo2utm(lat,lon):
     return myProj(lon,lat)
 
+def valid(id):
+    return query_results[id] is not None and len(query_results[id]) > 0
 
 cache_text = ''
 cache_result = None
@@ -73,13 +75,13 @@ if __name__ == '__main__':
 
 
     def get_geo_x(id, query_results):
-        return query_results[id][0]['geometry']['location']['lng'] if len(query_results[id]) > 0 else None
+        return query_results[id][0]['geometry']['location']['lng'] if valid(id) else None
 
     def get_geo_y(id, query_results):
-        return query_results[id][0]['geometry']['location']['lat'] if len(query_results[id]) > 0 else None
+        return query_results[id][0]['geometry']['location']['lat'] if valid(id) > 0 else None
 
     def get_viewport(id, query_results,axis=0):
-        if len(query_results[id]) < 1:
+        if not valid(id):
             return None
         vp = query_results[id][0]['geometry']['viewport']
         northeast = geo2utm(vp['northeast']['lat'],vp['northeast']['lng'])
@@ -87,29 +89,29 @@ if __name__ == '__main__':
         return int(np.abs(northeast[0] - southwest[0])) if axis == 0 else int(np.abs(northeast[1] - southwest[1]))
 
     def get_partial_match(id,query_results):
-        if  len(query_results[id]) < 1:
+        if not valid(id):
             return None
         return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
 
 
     def get_partial_match(id,query_results):
-        if  len(query_results[id]) < 1:
+        if not valid(id):
             return None
         return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
 
 
     def get_location_type(id, query_results):
-        return query_results[id][0]['geometry']['location_type'] if len(query_results[id]) > 0 else None
+        return query_results[id][0]['geometry']['location_type'] if valid(id) else None
 
     def get_location_types(id, query_results):
-        return ' '.join(query_results[id][0]['types']) if len(query_results[id]) > 0 else None
+        return ' '.join(query_results[id][0]['types']) if valid(id) else None
 
     df['gmapapi_x'] = df[id].apply(lambda t : get_geo_x(t,query_results))
     df['gmapapi_y'] = df[id].apply(lambda t : get_geo_y(t,query_results))
     df['gmapapi_location_type'] = df[id].apply(lambda t: get_location_type(t, query_results))
     df['gmapapi_viewport_x'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=0))
     df['gmapapi_viewport_y'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=1))
-    df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]))
+    df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]) if valid(t) else None)
     df['gmapapi_partial_match'] = df[id].apply(lambda t : get_partial_match(t,query_results))
     df['gmapapi_location_types'] = df[id].apply(lambda t : get_location_types(t,query_results))
 
