@@ -82,7 +82,8 @@ if __name__ == '__main__':
     def get_location_type(id, query_results):
         return query_results[id][0]['geometry']['location_type'] if len(query_results[id]) > 0 else None
 
-
+    def get_location_types(id, query_results):
+        return ' '.join(query_results[id][0]['types']) if len(query_results[id]) > 0 else None
 
     df['gmapapi_x'] = df[id].apply(lambda t : get_geo_x(t,query_results))
     df['gmapapi_y'] = df[id].apply(lambda t : get_geo_y(t,query_results))
@@ -91,6 +92,7 @@ if __name__ == '__main__':
     df['gmapapi_viewport_y'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=1))
     df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]))
     df['gmapapi_partial_match'] = df[id].apply(lambda t : get_partial_match(t,query_results))
+    df['gmapapi_location_types'] = df[id].apply(lambda t : get_location_types(t,query_results))
 
     new_file_name = file_name.replace('.csv', '_results.csv')
     print(f'save input dataframe with query results to: {new_file_name}')
