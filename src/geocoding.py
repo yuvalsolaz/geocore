@@ -2,6 +2,7 @@ import sys,os
 import pandas as pd
 import numpy as np
 import pickle
+from tqdm import tqdm
 from pyproj import Proj
 myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
@@ -61,7 +62,7 @@ if __name__ == '__main__':
             exit(10)
 
         gmaps = googlemaps.Client(key=mykey)
-        for index,row in df.sort_values(by=location_col).iterrows():
+        for index,row in tqdm(df.sort_values(by=location_col).iterrows(),total=df.shape[0]):
             query_results[row[id]] = geocode_api(gmaps,row[location_col])
 
         print(f'save results to : {query_results_file}')
