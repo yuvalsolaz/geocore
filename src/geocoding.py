@@ -7,12 +7,28 @@ myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +n
 
 #region consts
 query_results_file = r'../data/gapi_results.pkl'
-location_col = 'מקום'
+location_col = 'place'
 id = 'OBJECTID'
 # endregion consts
 
 def geo2utm(lat,lon):
     return myProj(lon,lat)
+
+
+cache_text = ''
+cache_result = None
+
+def geocode_api(gmaps,text):
+    global cache_text,cache_result
+    if type(text) is not str:
+        result = None
+    else:
+        # do not call api on the same text
+        result = gmaps.geocode(text) if text != cache_text else  cache_result
+    # update cache
+    cache_text = text
+    cache_result = result
+    return result
 
 if __name__ == '__main__':
 
@@ -43,9 +59,11 @@ if __name__ == '__main__':
         except:
             print(f'please add file src/apikey.py with one line:\n mykey=<valid api key> \n to your local repository')
             exit(10)
+
         gmaps = googlemaps.Client(key=mykey)
-        for index,row in df.iterrows():
-            query_results[row[id]] = gmaps.geocode(row[location_col])
+        for index,row in df.sort_values(by=location_col).iterrows():
+            query_results[row[id]] = geocode_api(gmaps,row[location_col])
+
         print(f'save results to : {query_results_file}')
         with open(query_results_file, 'wb') as fp:
             pickle.dump(query_results, fp)
