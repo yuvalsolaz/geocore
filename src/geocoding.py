@@ -7,7 +7,7 @@ from pyproj import Proj
 myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 #region consts
-query_results_file = os.path.join(os.getcwd(), r'../data/gapi_results.pkl')
+query_results_file = os.path.join(os.path.dirname(__file__), r'../data/gapi_results.pkl')
 location_col = 'place'
 id = 'OBJECTID'
 # endregion consts
