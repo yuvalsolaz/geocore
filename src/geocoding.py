@@ -7,7 +7,6 @@ from pyproj import Proj
 myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 #region consts
-query_results_file = os.path.join(os.getcwd(), r'../data/gapi_results_1500.pkl')
 location_col = 'place'
 id = 'OBJECTID'
 # endregion consts
@@ -38,8 +37,6 @@ def get_gmaps():
 def get_gmap_query_score(query_result):
     return 1
 
-def gmap_result_2_object(query_result):
-    return query_result
 
 def geocode_api(gmaps,text):
     global cache_text,cache_result
@@ -70,6 +67,7 @@ if __name__ == '__main__':
     print(df.head())
 
     query_results = {}
+    query_results_file = file_name.replace('.csv','_gapi.pkl')
     if os.path.exists(query_results_file):
         print(f'loading query results from file: {query_results_file}')
         with open(query_results_file,'rb') as fp:

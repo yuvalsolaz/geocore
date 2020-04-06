@@ -1,5 +1,6 @@
 apikey.py
-data/test_results.csv
+data/*_results.csv
+geoenv/*
 
 # pycharm
 .idea/
