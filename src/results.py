@@ -36,7 +36,7 @@ def compare_xy(df,first_x_field, first_y_field, second_x_field, second_y_field, 
     plt.hist(dist_list, bins=50, range=(0, dist_max_value))  # `density=False` would make counts
     plt.ylabel('count')
     plt.xlabel('distance [m]');
-    plt.title(hist_title + '. success percentage: {:.2f}'.format(1 - mistakes_cnt / df.shape[0]) );
+    plt.title(hist_title + '. less than {:.1f} meters percentage: {:.2f}'.format(dist_thresh,1 - mistakes_cnt / df.shape[0]) );
     fig1.savefig('figures/' + hist_title + '.png')
     plt.show()
 
