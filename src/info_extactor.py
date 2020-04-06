@@ -4,9 +4,8 @@ import json
 import pandas as pd
 
 # globals and default paths
-DEFAULT_CITY_PATH = os.path.join("..", "data", "yeshuvim_20200301.csv")
-DEFAULT_TYPE_JSON_PATH = os.path.join("type_regex.json")
-
+DEFAULT_CITY_PATH = os.path.join(os.path.dirname(__file__),r'../data/yeshuvim_20200301.csv')
+DEFAULT_TYPE_JSON_PATH = os.path.join(os.path.dirname(__file__),r'type_regex.json')
 
 
 def prepare_city_list():
