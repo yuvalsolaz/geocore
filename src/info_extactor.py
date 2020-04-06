@@ -5,7 +5,7 @@ import pandas as pd
 
 # globals and default paths
 DEFAULT_CITY_PATH = os.path.join("..", "data", "yeshuvim_20200301.csv")
-DEFAULT_ESSENCE_JSON_PATH = os.path.join("essensce_regex.json")
+DEFAULT_TYPE_JSON_PATH = os.path.join("type_regex.json")
 
 
 def prepare_city_list():
@@ -38,26 +38,25 @@ def prepare_city_list():
 
 
 class InfoExtractor:
-    def __init__(self, city_db_path=DEFAULT_CITY_PATH, essence_json_path=DEFAULT_ESSENCE_JSON_PATH):
+    def __init__(self, city_db_path=DEFAULT_CITY_PATH, type_json_path=DEFAULT_TYPE_JSON_PATH):
         self._column_list = []
-        with open(essence_json_path, "r") as fp: #todo fix json so the hebrew quotations will be okay
+        with open(type_json_path, "r") as fp: #todo fix json so the hebrew quotations will be okay
             regex_dict = json.load(fp)
         self._regex_list = []
-        self._essence_type = []
+        self._type_list = []
         for key, value in regex_dict.items(): #key is essence name, value is keywrods
             self._regex_list.append(r"(?=(" + '|'.join(value) + r"))")
-            self._essence_type.append(key)
+            self._type_list.append(key)
         self._city_db_path = city_db_path
         self._city_list = prepare_city_list()
         pass
 
-    def extract_essence(self, text) -> dict:
+    def extract_type(self, text) -> dict:
         result_dict = {"types" : []}
-        for current_essence_name, current_regex in zip(self._essence_type, self._regex_list):
+        for current_type, current_regex in zip(self._type_list, self._regex_list):
             if re.search(current_regex, text):
-                result_dict["types"].append(current_essence_name)
+                result_dict["types"].append(current_type)
         return result_dict
-
 
     def extract_city(self, text) -> str:
         candidate_text = text[-12:]
@@ -81,10 +80,10 @@ class InfoExtractor:
 if __name__ == "__main__":
     ie = InfoExtractor()
 
-    with open(DEFAULT_ESSENCE_JSON_PATH, "r") as fp: #todo fix json so the hebrew quotations will be okay
+    with open(DEFAULT_TYPE_JSON_PATH, "r") as fp: #todo fix json so the hebrew quotations will be okay
         print(json.load(fp))
-    example_text = r"בית ספר עירוני ה', רח' אבנר חושן 57 מודיעין"
-    result = ie.extract_essence(example_text)
+    example_text = r"בית ספר עירוני ה' אבנר חושן 57 מודיעין"
+    result = ie.extract_type(example_text)
     print(result)
     print(ie.extract_city(example_text))
     pass
