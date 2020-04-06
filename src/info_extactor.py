@@ -40,11 +40,11 @@ def prepare_city_list():
 class InfoExtractor:
     def __init__(self, city_db_path=DEFAULT_CITY_PATH, type_json_path=DEFAULT_TYPE_JSON_PATH):
         self._column_list = []
-        with open(type_json_path, "r") as fp: #todo fix json so the hebrew quotations will be okay
+        with open(type_json_path, "r") as fp:
             regex_dict = json.load(fp)
         self._regex_list = []
         self._type_list = []
-        for key, value in regex_dict.items(): #key is essence name, value is keywrods
+        for key, value in regex_dict.items(): #key is type name, value is keywrods
             self._regex_list.append(r"(?=(" + '|'.join(value) + r"))")
             self._type_list.append(key)
         self._city_db_path = city_db_path
@@ -52,7 +52,7 @@ class InfoExtractor:
         pass
 
     def extract_type(self, text) -> dict:
-        result_dict = {"types" : []}
+        result_dict = {"types": []}
         for current_type, current_regex in zip(self._type_list, self._regex_list):
             if re.search(current_regex, text):
                 result_dict["types"].append(current_type)
@@ -64,7 +64,7 @@ class InfoExtractor:
         for city in self._city_list:
             if city == candidate_text or (city in candidate_text and len(city) > len(best_match)):
                 best_match = city
-        print("text: " + text + " candidate_text: " + str(candidate_text) + " , city: " + best_match)
+#        print("text: " + text + " candidate_text: " + str(candidate_text) + " , city: " + best_match)
         return best_match
 
     def extract_street(self, text) -> dict:
@@ -74,16 +74,14 @@ class InfoExtractor:
     combines all of the modules functions to extract as much data as possible from text
     '''
     def extract_info(self, text) -> dict:
-        raise NotImplementedError
+        result_dict = dict()
+        result_dict["types"] = self.extract_type(text)["types"]
+        result_dict["city"] = self.extract_city(text)
+        return result_dict
 
 
 if __name__ == "__main__":
     ie = InfoExtractor()
-
-    with open(DEFAULT_TYPE_JSON_PATH, "r") as fp: #todo fix json so the hebrew quotations will be okay
-        print(json.load(fp))
     example_text = r"בית ספר עירוני ה' אבנר חושן 57 מודיעין"
-    result = ie.extract_type(example_text)
-    print(result)
-    print(ie.extract_city(example_text))
-    pass
+    print("example: " + example_text)
+    print(ie.extract_info(text=example_text))
