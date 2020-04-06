@@ -14,9 +14,6 @@ id = 'OBJECTID'
 def geo2utm(lat,lon):
     return myProj(lon,lat)
 
-def valid(id):
-    return query_results[id] is not None and len(query_results[id]) > 0
-
 cache_text = ''
 cache_result = None
 
@@ -32,22 +29,7 @@ def geocode_api(gmaps,text):
     cache_result = result
     return result
 
-if __name__ == '__main__':
-
-    if len(sys.argv) < 2:
-        print (f'usage: python {sys.argv[0]} <text file>')
-        exit(1)
-
-    # load geo texts from csv file :
-    file_name = sys.argv[1]
-    if not os.path.exists(file_name):
-        print (f'Error: file {file_name} not exists')
-        exit(2)
-
-    print(f'load input file {file_name}:')
-    df = pd.read_csv(file_name)
-    print(df.head())
-
+def add_geocoding_results(df):
     query_results = {}
     query_results_file = file_name.replace('.csv','_gapi.pkl')
     if os.path.exists(query_results_file):
@@ -73,6 +55,8 @@ if __name__ == '__main__':
 
     print('add query results to input dataframe:')
 
+    def valid(id):
+        return query_results[id] is not None and len(query_results[id]) > 0
 
     def get_geo_x(id, query_results):
         return query_results[id][0]['geometry']['location']['lng'] if valid(id) else None
@@ -114,6 +98,26 @@ if __name__ == '__main__':
     df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]) if valid(t) else None)
     df['gmapapi_partial_match'] = df[id].apply(lambda t : get_partial_match(t,query_results))
     df['gmapapi_location_types'] = df[id].apply(lambda t : get_location_types(t,query_results))
+
+    return df
+
+if __name__ == '__main__':
+
+    if len(sys.argv) < 2:
+        print (f'usage: python {sys.argv[0]} <text file>')
+        exit(1)
+
+    # load geo texts from csv file :
+    file_name = sys.argv[1]
+    if not os.path.exists(file_name):
+        print (f'Error: file {file_name} not exists')
+        exit(2)
+
+    print(f'load input file {file_name}:')
+    df = pd.read_csv(file_name)
+    print(df.head())
+
+    df = add_geocoding_results(df)
 
     new_file_name = file_name.replace('.csv', '_results.csv')
     print(f'save input dataframe with query results to: {new_file_name}')
