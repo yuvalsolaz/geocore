@@ -8,6 +8,7 @@ DEFAULT_CITY_PATH = os.path.join("..", "data", "yeshuvim_20200301.csv")
 DEFAULT_TYPE_JSON_PATH = os.path.join("type_regex.json")
 
 
+
 def prepare_city_list():
     yeshuv_df = pd.read_csv(DEFAULT_CITY_PATH, encoding="cp1255", usecols=["שם_ישוב"], skiprows=1, dtype=str)
     yeshuv_df["שם_ישוב"] = yeshuv_df["שם_ישוב"].apply(lambda x: x.split("  ")[0].replace(")", "").replace("(", ""))
@@ -56,6 +57,7 @@ class InfoExtractor:
         for current_type, current_regex in zip(self._type_list, self._regex_list):
             if re.search(current_regex, text):
                 result_dict["types"].append(current_type)
+        # TODO: if fails, use the Google API location type
         return result_dict
 
     def extract_city(self, text) -> str:
@@ -65,6 +67,8 @@ class InfoExtractor:
             if city == candidate_text or (city in candidate_text and len(city) > len(best_match)):
                 best_match = city
 #        print("text: " + text + " candidate_text: " + str(candidate_text) + " , city: " + best_match)
+        if best_match == '   ':  #failed extraction
+            return None
         return best_match
 
     def extract_street(self, text) -> dict:
