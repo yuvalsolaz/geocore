@@ -53,12 +53,14 @@ class InfoExtractor:
         pass
 
     def extract_type(self, text) -> dict:
-        result_dict = {"types": []}
+        result_list = []
         for current_type, current_regex in zip(self._type_list, self._regex_list):
             if re.search(current_regex, text):
-                result_dict["types"].append(current_type)
+                result_list.append(current_type)
         # TODO: if fails, use the Google API location type
-        return result_dict
+        if len(result_list) > 0:
+            return result_list
+        return None
 
     def extract_city(self, text) -> str:
         candidate_text = text[-12:]
