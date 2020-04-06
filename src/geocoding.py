@@ -7,7 +7,7 @@ from pyproj import Proj
 myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 #region consts
-query_results_file = os.path.join(os.getcwd(), r'../data/gapi_results.pkl')
+query_results_file = os.path.join(os.getcwd(), r'../data/gapi_results_1500.pkl')
 location_col = 'place'
 id = 'OBJECTID'
 # endregion consts
@@ -20,6 +20,26 @@ def valid(id):
 
 cache_text = ''
 cache_result = None
+
+
+# TODO - where is apikey.py file?
+def get_gmaps():
+    import googlemaps
+    try:
+        from apikey import mykey
+    except:
+        print(f'please add file src/apikey.py with one line:\n mykey=<valid api key> \n to your local repository')
+        exit(10)
+
+    gmaps = googlemaps.Client(key=mykey)
+    return gmaps
+
+# TODO - implementation
+def get_gmap_query_score(query_result):
+    return 1
+
+def gmap_result_2_object(query_result):
+    return query_result
 
 def geocode_api(gmaps,text):
     global cache_text,cache_result
