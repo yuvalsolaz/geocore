@@ -29,9 +29,8 @@ def geocode_api(gmaps,text):
     cache_result = result
     return result
 
-def add_geocoding_results(df):
+def add_geocoding_results(df,query_results_file):
     query_results = {}
-    query_results_file = file_name.replace('.csv','_gapi.pkl')
     if os.path.exists(query_results_file):
         print(f'loading query results from file: {query_results_file}')
         with open(query_results_file,'rb') as fp:
