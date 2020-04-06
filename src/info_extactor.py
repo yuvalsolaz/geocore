@@ -1,12 +1,12 @@
 import os
+import sys
 import re
 import json
 import pandas as pd
 
 # globals and default paths
-DEFAULT_CITY_PATH = os.path.join("..", "data", "yeshuvim_20200301.csv")
-DEFAULT_TYPE_JSON_PATH = os.path.join("type_regex.json")
-
+DEFAULT_CITY_PATH = os.path.join(os.path.dirname(__file__), r'../data/yeshuvim_20200301.csv')
+DEFAULT_TYPE_JSON_PATH = os.path.join(os.path.dirname(__file__),r'type_regex.json')
 
 def prepare_city_list():
     yeshuv_df = pd.read_csv(DEFAULT_CITY_PATH, encoding="cp1255", usecols=["שם_ישוב"], skiprows=1, dtype=str)
@@ -35,7 +35,6 @@ def prepare_city_list():
             pass
     all_seperated_names = set(all_seperated_names)
     return all_seperated_names
-
 
 class InfoExtractor:
     def __init__(self, city_db_path=DEFAULT_CITY_PATH, type_json_path=DEFAULT_TYPE_JSON_PATH):
@@ -76,7 +75,32 @@ class InfoExtractor:
     def extract_info(self, text) -> dict:
         raise NotImplementedError
 
+if __name__ == '__main__':
 
+    if len(sys.argv) < 2:
+        print (f'usage: python {sys.argv[0]} <text file>')
+        exit(1)
+
+    # load geo texts from csv file :
+    file_name = sys.argv[1]
+    if not os.path.exists(file_name):
+        print (f'Error: file {file_name} not exists')
+        exit(2)
+
+    print(f'load input file {file_name}:')
+    df = pd.read_csv(file_name)
+    print(df.head())
+
+    ie = InfoExtractor()
+    df['extractor_place_type'] = df['place'].apply(lambda t: ie.extract_type(t))
+    df['extractor_city'] = df['place'].apply(lambda t: ie.extract_city(t))
+
+    new_file_name = file_name.replace('.csv', '_results.csv')
+    print(f'save input dataframe with query results to: {new_file_name}')
+    df.to_csv(new_file_name)
+
+'''
+### test method 
 if __name__ == "__main__":
     ie = InfoExtractor()
 
@@ -87,3 +111,4 @@ if __name__ == "__main__":
     print(result)
     print(ie.extract_city(example_text))
     pass
+'''
