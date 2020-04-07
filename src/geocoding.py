@@ -4,7 +4,8 @@ import numpy as np
 import pickle
 from tqdm import tqdm
 from pyproj import Proj
-myProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+geo2utmProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+utm2GeoProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs",reversed=True)
 
 #region consts
 location_col = 'place'
@@ -12,7 +13,10 @@ id = 'OBJECTID'
 # endregion consts
 
 def geo2utm(lat,lon):
-    return myProj(lon,lat)
+    return geo2utmProj(lon,lat)
+
+def utm2geo(lat,lon):
+    return utm2GeoProj(lon,lat)
 
 cache_text = ''
 cache_result = None
