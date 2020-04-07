@@ -30,11 +30,13 @@ if __name__ == '__main__':
         if type(text) is not str:
             return None
         res =  ie.extract_type(text)
-        return res[0] if len(res) > 0 else None
+        return res[0] if res is not None else None
+
     def get_city(text):
         if type(text) is not str:
             return None
         return  ie.extract_city(text)
+
     df['extractor_place_type'] = df['place'].apply(lambda t: get_type(t))
     df['extractor_city'] = df['place'].apply(lambda t: get_city(t))
 
