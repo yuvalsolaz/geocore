@@ -60,7 +60,7 @@ class InfoExtractor:
         return None
 
     def extract_city(self, text) -> str:
-        candidate_text = text[-12:]
+        candidate_text = text[-15:]
         best_match = "   "
         for city in self._city_list:
             if city == candidate_text or (city in candidate_text and len(city) > len(best_match)):
