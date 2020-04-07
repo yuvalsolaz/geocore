@@ -5,7 +5,7 @@ import pickle
 from tqdm import tqdm
 from pyproj import Proj
 geo2utmProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
-utm2GeoProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs",reversed=True))
+utm2GeoProj = Proj("+proj=utm +zone=36K, +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs",reversed=True)
 
 #region consts
 location_col = 'place'
