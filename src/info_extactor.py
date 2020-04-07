@@ -88,3 +88,4 @@ if __name__ == "__main__":
     example_text = r"בית ספר עירוני ה' אבנר חושן 57 מודיעין"
     print("example: " + example_text)
     print(ie.extract_info(text=example_text))
+
