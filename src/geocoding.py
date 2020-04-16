@@ -45,11 +45,12 @@ def create_gmap_engine():
     return gmaps
 
 
-def cahced_geocoding(gmaps,text):
-    # new text call api :
+def get_geocoding(gmaps,text):
+
     if type(text) is not str:
         print(f'text field type mismatch {type(text)} is not str')
         return None
+
     # replace all (') chars  with (") to prevent sql errors:
     text = text.replace('\'','')
 
@@ -72,6 +73,7 @@ def cahced_geocoding(gmaps,text):
     # update cache :
     print(f'update cache {cache_table} with results')
     try:
+        # replace all (') chars  with (") to prevent sql errors:
         geocode_results_json = json.dumps(geocode_results).replace('\'', '')
         insetr_sql = f'''
         insert into {cache_table} (text, results) values ('{text}', '{geocode_results_json}')
@@ -82,64 +84,30 @@ def cahced_geocoding(gmaps,text):
 
     return geocode_results
 
-#region depracted :
-'''
-def add_cahced_geocoding_results(df):
 
-    query_results = {}
+def apply_geocoding(df):
+
     gmaps = create_gmap_engine()
     for index, row in tqdm(df.iterrows(),total=df.shape[0]):
-        query_results[row[id]] = cahced_geocoding(gmaps, row[location_col])
-
-    print('add gmaps results to input dataframe:')
-
-    def valid(id):
-        return query_results[id] is not None and len(query_results[id]) > 0
-
-    def get_geo_x(id, query_results):
-        return query_results[id][0]['geometry']['location']['lng'] if valid(id) else None
-
-    def get_geo_y(id, query_results):
-        return query_results[id][0]['geometry']['location']['lat'] if valid(id) > 0 else None
-
-    def get_viewport(id, query_results,axis=0):
-        if not valid(id):
-            return None
-        vp = query_results[id][0]['geometry']['viewport']
-        northeast = geo2utm(vp['northeast']['lat'],vp['northeast']['lng'])
-        southwest = geo2utm(vp['southwest']['lat'],vp['southwest']['lng'])
-        return int(np.abs(northeast[0] - southwest[0])) if axis == 0 else int(np.abs(northeast[1] - southwest[1]))
-
-    def get_partial_match(id,query_results):
-        if not valid(id):
-            return None
-        return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
-
-
-    def get_partial_match(id,query_results):
-        if not valid(id):
-            return None
-        return query_results[id][0]['partial_match'] if 'partial_match' in query_results[id][0] else False
-
-
-    def get_location_type(id, query_results):
-        return query_results[id][0]['geometry']['location_type'] if valid(id) else None
-
-    def get_location_types(id, query_results):
-        return ' '.join(query_results[id][0]['types']) if valid(id) else None
-
-    df['gmapapi_x'] = df[id].apply(lambda t : get_geo_x(t,query_results))
-    df['gmapapi_y'] = df[id].apply(lambda t : get_geo_y(t,query_results))
-    df['gmapapi_location_type'] = df[id].apply(lambda t: get_location_type(t, query_results))
-    df['gmapapi_viewport_x'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=0))
-    df['gmapapi_viewport_y'] = df[id].apply(lambda t: get_viewport(t,query_results, axis=1))
-    df['gmapapi_count'] = df[id].apply(lambda t: len(query_results[t]) if valid(t) else None)
-    df['gmapapi_partial_match'] = df[id].apply(lambda t : get_partial_match(t,query_results))
-    df['gmapapi_location_types'] = df[id].apply(lambda t : get_location_types(t,query_results))
+        geocoding_results = get_geocoding(gmaps, row[location_col])
+        if geocoding_results is None or len(geocoding_results) < 1:
+            continue
+        vp = geocoding_results[0]['geometry']['viewport']
+        northeast = geo2utm(vp['northeast']['lat'], vp['northeast']['lng'])
+        southwest = geo2utm(vp['southwest']['lat'], vp['southwest']['lng'])
+        row['gmapapi_x'] = geocoding_results[0]['geometry']['location']['lng']
+        row['gmapapi_y'] = geocoding_results[0]['geometry']['location']['lat']
+        row['gmapapi_location_type'] = geocoding_results[0]['geometry']['location_type']
+        row['gmapapi_viewport_x'] = int(np.abs(northeast[0] - southwest[0]))
+        row['gmapapi_viewport_y'] = int(np.abs(northeast[1] - southwest[1]))
+        row['gmapapi_count'] = len(geocoding_results)
+        row['gmapapi_partial_match'] = geocoding_results[0]['partial_match'] if 'partial_match' in geocoding_results[0] else False
+        row['gmapapi_location_types'] = ' '.join(geocoding_results[0]['types'])
 
     return df
 
-
+#region depracted :
+'''
 cache_text = ''
 cache_result = None
 
@@ -245,7 +213,7 @@ if __name__ == '__main__':
     df = pd.read_csv(file_name)
     print(df.head())
 
-    df = add_cahced_geocoding_results(df)
+    df = apply_geocoding(df)
 
     new_file_name = file_name.replace('.csv', '_results.csv')
     print(f'save input dataframe with query results to: {new_file_name}')
