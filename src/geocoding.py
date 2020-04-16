@@ -88,9 +88,11 @@ def get_geocoding(gmaps,text):
 def apply_geocoding(df):
 
     gmaps = create_gmap_engine()
+    res_df = pd.DataFrame()
     for index, row in tqdm(df.iterrows(),total=df.shape[0]):
         geocoding_results = get_geocoding(gmaps, row[location_col])
         if geocoding_results is None or len(geocoding_results) < 1:
+            res_df = res_df.append(row)
             continue
         vp = geocoding_results[0]['geometry']['viewport']
         northeast = geo2utm(vp['northeast']['lat'], vp['northeast']['lng'])
@@ -103,8 +105,9 @@ def apply_geocoding(df):
         row['gmapapi_count'] = len(geocoding_results)
         row['gmapapi_partial_match'] = geocoding_results[0]['partial_match'] if 'partial_match' in geocoding_results[0] else False
         row['gmapapi_location_types'] = ' '.join(geocoding_results[0]['types'])
+        res_df = res_df.append(row)
 
-    return df
+    return res_df
 
 #region depracted :
 '''
