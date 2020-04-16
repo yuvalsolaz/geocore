@@ -60,10 +60,10 @@ def create_network(data):
 
 def load_data(url):
     r = requests.get(url)
-    normal_data = r.json()
-    updateTime = datetime.fromtimestamp(normal_data['lastUpdateDate'] / 1000)
+    data = r.json()
+    updateTime = datetime.fromtimestamp(data['lastUpdateDate'] / 1000)
     print(f'latst update date: {updateTime.isoformat()}')
-    return create_network(normal_data)
+    return create_network(data)
 
 
 if __name__ == '__main__':
