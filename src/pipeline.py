@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-from geocoding import add_geocoding_results
+from geocoding import apply_geocoding
 from info_extactor import InfoExtractor
 
 if __name__ == '__main__':
@@ -21,8 +21,7 @@ if __name__ == '__main__':
     print(df.head())
 
     print(f'add geocoding results from google api:')
-    query_results_file = file_name.replace('.csv', '_gapi.pkl')
-    df = add_geocoding_results(df,query_results_file)
+    df = apply_geocoding(df)
 
     print(f'add regex results from info extractor :')
     ie = InfoExtractor()
