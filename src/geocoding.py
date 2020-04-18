@@ -10,7 +10,8 @@ from sqlalchemy import create_engine
 #region config :
 location_col = 'place'
 cache_table = 'research.geocoding_cache'
-db = create_engine(r'postgresql://postgres:sergtsop@pg-covid-19.clqp7zznjkvp.eu-west-2.rds.amazonaws.com:5432/postgres')
+connection_str = r'postgresql://postgres:sergtsop@pg-covid-19.clqp7zznjkvp.eu-west-2.rds.amazonaws.com:5432/postgres'
+db = create_engine(connection_str)
 # endregion config
 
 
