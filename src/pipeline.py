@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-from geocoding import apply_geocoding
+from geocoding import apply_geocoding, db
 from info_extactor import InfoExtractor
 
 if __name__ == '__main__':
@@ -40,5 +40,11 @@ if __name__ == '__main__':
     df['extractor_city'] = df['place'].apply(lambda t: get_city(t))
 
     new_file_name = file_name.replace('.csv', '_results.csv')
+    df.columns = pd.Index([c.translate({ord(i): None for i in "\',()"}) for c in df.columns])
     print(f'save input dataframe with query results to: {new_file_name}')
     df.to_csv(new_file_name)
+
+    # save results to database:
+    table_name = os.path.basename(file_name).replace('.csv', '')
+    print(f'save input dataframe with query results to table: {table_name}')
+    df.to_sql(f'results.{table_name}', db, if_exists='replace',index=True)
