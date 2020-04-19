@@ -47,4 +47,4 @@ if __name__ == '__main__':
     # save results to database:
     table_name = os.path.basename(file_name).replace('.csv', '')
     print(f'save input dataframe with query results to table: {table_name}')
-    df.to_sql(f'results.{table_name}', db, if_exists='replace',index=True)
+    df.to_sql(schema='results',name=table_name, con=db, if_exists='replace' ,index=True)
