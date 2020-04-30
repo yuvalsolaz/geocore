@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+import json
+import sys,io
+from googletrans import Translator
+
+translator = Translator()
+
+def flip_words(text):
+   words = text.split()
+   return ' '.join([word[::-1] if translator.detect(word).lang in ['iw','ar'] else word for word in words[::-1]])
+
+try:
+   input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8')
+   text = input_stream.read()
+   translated_text = translator.translate(text,dest='he')
+   sys.stdout.write(flip_words(translated_text.text)+'\n')
+
+except KeyboardInterrupt:
+   sys.stdout.flush()
+   pass
