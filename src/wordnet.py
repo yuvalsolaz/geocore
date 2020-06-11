@@ -19,6 +19,8 @@ def flatten(lst):
         return [lst]
 
 
+lang = 'arb'
+
 if __name__ == '__main__':
 
     if len(sys.argv) < 2:
@@ -33,13 +35,16 @@ if __name__ == '__main__':
     print(f'found {len(ewords)} english syns for the word {eword}:')
     print(' '.join([w.name() for w in ewords]))
     print()
-    hwords = [wn.synset(ew.name()).lemma_names('heb') for ew in ewords if len(wn.synset(ew.name()).lemma_names('heb')) > 0]
+    hwords = [wn.synset(ew.name()).lemma_names(lang) for ew in ewords if len(wn.synset(ew.name()).lemma_names('heb')) > 0]
     hwords_str = '/'.join([' '.join(hw) for hw in hwords])
-    print(f'hebrew synsets for {eword}: {hwords_str}:')
+    print(f'hebrew synsets for {eword}: {flip_words(hwords_str)}:')
+    print()
+    print(f'translation: {flip_words(translator.translate(hwords_str,dest="iw").text)}')
 
     print()
-    syns = [[wn.synsets(h,lang='heb') for h in  hw] for hw in hwords]
+    syns = [[wn.synsets(h,lang=lang) for h in  hw] for hw in hwords]
     syns_str = ' '.join([l.name() for l in flatten(syns)])
-    print(f'english syns for {hwords_str}:\n {syns_str}')
+    print(f'back to english syns:\n {syns_str}')
+
 
 
