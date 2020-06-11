@@ -37,7 +37,7 @@ if __name__ == '__main__':
     print()
     hwords = [wn.synset(ew.name()).lemma_names(lang) for ew in ewords if len(wn.synset(ew.name()).lemma_names('heb')) > 0]
     hwords_str = '/'.join([' '.join(hw) for hw in hwords])
-    print(f'hebrew synsets for {eword}: {flip_words(hwords_str)}:')
+    print(f'{lang} synsets for {eword}: {flip_words(hwords_str)}:')
     print()
     print(f'translation: {flip_words(translator.translate(hwords_str,dest="iw").text)}')
 
