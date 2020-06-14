@@ -26,6 +26,8 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print(f'usage: python {sys.argv[0]} <word>')
 
+    print(f'nltk supported langueges {sorted(wn.langs())}')
+
     eword = sys.argv[1]
     ewords = wn.synsets(eword)
     if len(eword) < 1:
@@ -35,12 +37,15 @@ if __name__ == '__main__':
     print(f'found {len(ewords)} english syns for the word {eword}:')
     print(' '.join([w.name() for w in ewords]))
     print()
-    hwords = [wn.synset(ew.name()).lemma_names(lang) for ew in ewords if len(wn.synset(ew.name()).lemma_names('heb')) > 0]
+    hwords = [wn.synset(ew.name()).lemma_names(lang) for ew in ewords if len(wn.synset(ew.name()).lemma_names(lang)) > 0]
     hwords_str = '/'.join([' '.join(hw) for hw in hwords])
     print(f'{lang} synsets for {eword}: {flip_words(hwords_str)}:')
     print()
-    print(f'translation: {flip_words(translator.translate(hwords_str,dest="iw").text)}')
-
+    print(f'hebrew translation: {flip_words(translator.translate(hwords_str,dest="iw").text)}')
+    print()
+    print([ew.definition() for ew in ewords])
+    print()
+    print([ew.lexname() for ew in ewords])
     print()
     syns = [[wn.synsets(h,lang=lang) for h in  hw] for hw in hwords]
     syns_str = ' '.join([l.name() for l in flatten(syns)])
