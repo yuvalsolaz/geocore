@@ -1,6 +1,7 @@
 import sys,os
 from nltk.corpus import wordnet as wn
 from googletrans import Translator
+import unicodedata
 
 translator = Translator()
 
@@ -19,7 +20,7 @@ def flatten(lst):
         return [lst]
 
 
-lang = 'heb'
+lang = 'arb'
 
 if __name__ == '__main__':
 
@@ -40,6 +41,10 @@ if __name__ == '__main__':
     for ew in ewords:
         name = ew.name()
         lname = wn.synset(ew.name()).lemma_names(lang)
+        print (f'{lname} {[l.encode("utf8")  for l in lname]}')
+        print (f'{lname} {[[unicodedata.name(l) for l in ll]  for ll in lname]}')
+
+
         trans = flip_words(translator.translate(lname, dest="iw")[0].text if len(lname) > 0 else 'unknown')
         definition = ew.definition()
         lex = ew.lexname()
